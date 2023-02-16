@@ -6,7 +6,7 @@
 #    By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/22 15:07:14 by alvgomez          #+#    #+#              #
-#    Updated: 2023/02/16 11:11:13 by alvgomez         ###   ########.fr        #
+#    Updated: 2023/02/16 12:55:50 by alvgomez         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ $(OBJ_DIR):
 		@mkdir -p $(OBJ_DIR)
 		
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INCL)
-	$(CC) $(CFLAGS) -I$(INCL_DIR) -lpthread -c $< -o $@
+	$(CC) $(CFLAGS) -I$(INCL_DIR) -c $< -o $@
 
 clean:	
 		@rm -f ${OBJ}
