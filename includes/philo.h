@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:41:28 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/16 19:37:27 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/20 11:30:14 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,33 @@
 # include <stdlib.h>
 # include <string.h>
 # include <pthread.h>
-#include <sys/time.h>
-#include <sys/errno.h>
+# include <sys/time.h>
+# include <sys/errno.h>
 
-typedef struct s_philo
+typedef struct s_info
 {
-	pthread_t		*threads;
-	pthread_mutex_t mutex;
-	int				philo;
 	int				nb_philo;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				nb_must_eat;
+	pthread_mutex_t mutex_eat;
+	pthread_mutex_t mutex_fork;
+	pthread_mutex_t mutex_print;
+}				t_info;
+
+typedef struct s_philo
+{
+	pthread_t		threads;
+	int				philo_id;
+	t_info			*inf;
 }				t_philo;
+
+//Utils
+int		ft_atoi(char *str);
+void	ft_free(t_philo **p);
+t_info	*inicialize_info(char **argv);
+t_philo	**inicialize_philo(char **argv);
 
 #endif
 
