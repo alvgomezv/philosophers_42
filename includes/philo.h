@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:41:28 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/20 11:30:14 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/20 15:30:36 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,21 @@ typedef struct s_info
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				nb_must_eat;
+	int				dead;
 	pthread_mutex_t mutex_eat;
 	pthread_mutex_t mutex_fork;
 	pthread_mutex_t mutex_print;
+	pthread_mutex_t mutex_die;
 }				t_info;
 
 typedef struct s_philo
 {
 	pthread_t		threads;
-	int				philo_id;
 	t_info			*inf;
+	int				philo_id;
+	int				nb_must_eat;
+	int				ate;
+	int				over;
 }				t_philo;
 
 //Utils
@@ -45,6 +49,7 @@ int		ft_atoi(char *str);
 void	ft_free(t_philo **p);
 t_info	*inicialize_info(char **argv);
 t_philo	**inicialize_philo(char **argv);
+void	print_time(t_philo *p, int nb);
 
 #endif
 

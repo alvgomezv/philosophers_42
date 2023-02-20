@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:28:34 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/20 11:42:31 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/20 17:57:43 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,26 +17,95 @@ void	leaks(void)
 	system("leaks -q philo");
 }
 
-void eating(t_philo	*p)
+
+
+int	all_finished_eating(t_philo	**p, t_info *inf)
 {
-	struct timeval tv;
-	unsigned long long 	milliseconds;
+	int	i;
+	int finished;
+
+	i = 0;
+	finished = 1;
+	while (i < inf->nb_philo)
+	{
+		if(p[i]->over != 1)
+			finished = 0;
+		i++;
+	}
+	return (finished);
+}
+
+void	sleeping(t_philo *p)
+{
+	print_time(p, 3);
+	usleep(p->inf->time_to_sleep * 1000);
+}
+
+void	*dying_routine(void *arg)
+{
+	t_philo	*p;
+	int		round;
+
+	p = (t_philo *)arg;
+	round = p->nb_must_eat;
+	p->ate = 0;
+	usleep(p->inf->time_to_die * 1000);
+	while(1)
+	{
+		if (p->ate == 0 && round == p->nb_must_eat && p->over != 1)
+		{
+			pthread_mutex_lock(&p->inf->mutex_die);
+			print_time(p, 5);
+			p->inf->dead = 1;
+			sleep(1);
+			pthread_mutex_unlock(&p->inf->mutex_die);
+			break;
+		}
+	}
+	return (0);
+}
+
+void	eating(t_philo	*p)
+{
+	pthread_t	t_died;
 	
-	gettimeofday(&tv, NULL);
-	milliseconds = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
-	printf("%d %d is eating\n", tv.tv_usec, p->philo_id);
+	if(pthread_mutex_lock(&p->inf->mutex_eat) != 0)
+		perror("Failed to lock mutex_eat");
+	print_time(p, 2);
+	p->ate = 1;
+	usleep(p->inf->time_to_eat * 1000);
+	if (p->nb_must_eat != -1)
+		p->nb_must_eat--;
+	if (p->nb_must_eat == 0)
+		p->over = 1;
+	if (pthread_create(&t_died, NULL, &dying_routine, p) != 0)
+		perror("Failed to create thread dying");
+	printf("%d -> nb_must_eat: %d\n",p->philo_id, p->nb_must_eat);
+	if(pthread_mutex_unlock(&p->inf->mutex_eat) != 0)
+		perror("Failed to unlock mutex_eat");
 }
 
 void	*routine(void *arg)
 {
-	t_philo	*p;
+	t_philo		*p;
+	pthread_t	t_died;
 
 	p = (t_philo *)arg;
-	if(pthread_mutex_lock(&p->inf->mutex_eat) != 0)
-		perror("Failed to lock mutex");
-	eating(p);
-	if(pthread_mutex_unlock(&p->inf->mutex_eat) != 0)
-		perror("Failed to unlock mutex");
+	if (pthread_create(&t_died, NULL, &dying_routine, p) != 0)
+			perror("Failed to create thread dying");
+	//if (pthread_detach(t_died) != 0)
+	//		perror("Failed to detach thread dying");
+	while (1)
+	{
+		if (!p->inf->dead)
+		{
+			eating(p);
+			sleeping(p);
+		}
+		if (p->over != 0)
+			break;
+	}
+	printf("%d finished\n",p->philo_id);
 	return (0);
 }
 
@@ -55,14 +124,30 @@ void	philo_routine(t_philo **p, char **argv)
 		p[i]->inf = inf;
 		p[i]->philo_id = i + 1;
 		if (pthread_create(&p[i]->threads, NULL, &routine, p[i]) != 0)
-			perror("Failed to create thread");
+			perror("Failed to create thread philosopher");
 		i++;
 	}
 	i = 0;
+	while (all_finished_eating(p, inf) == 0)
+	{
+		if(inf->dead)
+		{
+			while (i < inf->nb_philo)
+			{
+				if (pthread_detach(p[i]->threads) != 0)
+					perror("Failed to deatch thread philosopher");
+				i++;
+			}
+			break;
+		}
+	}
+	
 	while (i < inf->nb_philo)
 	{
 		if (pthread_join(p[i]->threads, NULL) != 0)
-			perror("Failed to create thread");
+			perror("Failed to join thread philosopher");
+		//if (pthread_detach(p[i]->threads) != 0)
+		//	perror("Failed to deatch thread philosopher");
 		i++;
 	}
 	pthread_mutex_destroy(&inf->mutex_eat);
