@@ -19,20 +19,20 @@ void	leaks(void)
 
 
 
-int	all_finished_eating(t_philo	**p, t_info *inf)
+int	all_finished(t_philo	**p, t_info *inf)
 {
 	int	i;
-	int finished;
+	int all_finish;
 
 	i = 0;
-	finished = 1;
+	all_finish = 1;
 	while (i < inf->nb_philo)
 	{
-		if(p[i]->over != 1)
-			finished = 0;
+		if(p[i]->finished != 1)
+			all_finish = 0;
 		i++;
 	}
-	return (finished);
+	return (all_finish);
 }
 
 void	sleeping(t_philo *p)
@@ -65,6 +65,15 @@ void	*dying_routine(void *arg)
 	return (0);
 }
 
+void	picking_forks(t_philo *p)
+{
+	if(pthread_mutex_lock(&p->mutex_forks) != 0)
+		perror("Failed to lock mutex_forks");
+	
+	if(pthread_mutex_unlock(&p->mutex_forks) != 0)
+		perror("Failed to unlock mutex_forks");
+}
+
 void	eating(t_philo	*p)
 {
 	pthread_t	t_died;
@@ -80,6 +89,8 @@ void	eating(t_philo	*p)
 		p->over = 1;
 	if (pthread_create(&t_died, NULL, &dying_routine, p) != 0)
 		perror("Failed to create thread dying");
+	if (pthread_detach(t_died) != 0)
+		perror("Failed to detach thread dying");
 	printf("%d -> nb_must_eat: %d\n",p->philo_id, p->nb_must_eat);
 	if(pthread_mutex_unlock(&p->inf->mutex_eat) != 0)
 		perror("Failed to unlock mutex_eat");
@@ -93,18 +104,18 @@ void	*routine(void *arg)
 	p = (t_philo *)arg;
 	if (pthread_create(&t_died, NULL, &dying_routine, p) != 0)
 			perror("Failed to create thread dying");
-	//if (pthread_detach(t_died) != 0)
-	//		perror("Failed to detach thread dying");
-	while (1)
+	if (pthread_detach(t_died) != 0)
+			perror("Failed to detach thread dying");
+	while (!p->inf->dead)
 	{
-		if (!p->inf->dead)
-		{
-			eating(p);
-			sleeping(p);
-		}
+		picking_forks(p);
+		eating(p);
+		sleeping(p);
 		if (p->over != 0)
 			break;
 	}
+	if (p->over == 1)
+		p->finished = 1;
 	printf("%d finished\n",p->philo_id);
 	return (0);
 }
@@ -125,31 +136,33 @@ void	philo_routine(t_philo **p, char **argv)
 		p[i]->philo_id = i + 1;
 		if (pthread_create(&p[i]->threads, NULL, &routine, p[i]) != 0)
 			perror("Failed to create thread philosopher");
+		if (pthread_detach(p[i]->threads) != 0)
+			perror("Failed to deatch thread philosopher");
 		i++;
 	}
-	i = 0;
-	while (all_finished_eating(p, inf) == 0)
+	//i = 0;
+	while (all_finished(p, inf) == 0)
 	{
 		if(inf->dead)
 		{
-			while (i < inf->nb_philo)
-			{
-				if (pthread_detach(p[i]->threads) != 0)
-					perror("Failed to deatch thread philosopher");
-				i++;
-			}
+			//while (i < inf->nb_philo)
+			//{
+			//	if (pthread_detach(p[i]->threads) != 0)
+			//		perror("Failed to deatch thread philosopher");
+			//	i++;
+			//}
 			break;
 		}
 	}
-	
-	while (i < inf->nb_philo)
-	{
-		if (pthread_join(p[i]->threads, NULL) != 0)
-			perror("Failed to join thread philosopher");
-		//if (pthread_detach(p[i]->threads) != 0)
-		//	perror("Failed to deatch thread philosopher");
-		i++;
-	}
+	//i = 0;
+	//while (i < inf->nb_philo)
+	//{
+	//	if (pthread_join(p[i]->threads, NULL) != 0)
+	//		perror("Failed to join thread philosopher");
+	//	//if (pthread_detach(p[i]->threads) != 0)
+	//	//	perror("Failed to deatch thread philosopher");
+	//	i++;
+	//}
 	pthread_mutex_destroy(&inf->mutex_eat);
 	pthread_mutex_destroy(&inf->mutex_fork);
 	pthread_mutex_destroy(&inf->mutex_print);

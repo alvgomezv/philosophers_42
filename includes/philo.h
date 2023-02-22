@@ -28,8 +28,8 @@ typedef struct s_info
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				dead;
+	pthread_mutex_t *mutex_forks;
 	pthread_mutex_t mutex_eat;
-	pthread_mutex_t mutex_fork;
 	pthread_mutex_t mutex_print;
 	pthread_mutex_t mutex_die;
 }				t_info;
@@ -40,8 +40,11 @@ typedef struct s_philo
 	t_info			*inf;
 	int				philo_id;
 	int				nb_must_eat;
+	int				fork_left;
+	int				fork_right;
 	int				ate;
 	int				over;
+	int				finished;
 }				t_philo;
 
 //Utils

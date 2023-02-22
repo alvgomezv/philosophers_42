@@ -53,11 +53,13 @@ void	ft_free(t_philo **p)
 t_info	*inicialize_info(char **argv)
 {
 	t_info	*inf;
+	int		i;
 
 	inf = (t_info *)malloc(sizeof(t_info));
 	if (!inf)
 		perror("Failed to allocate memory");
 	inf->nb_philo = ft_atoi(argv[1]);
+	inf->mutex_forks = (t_infopthread_mutex_t *)malloc(inf->nb_philo * sizeof(pthread_mutex_t))
 	inf->time_to_die = ft_atoi(argv[2]);
 	inf->time_to_eat = ft_atoi(argv[3]);
 	inf->time_to_sleep = ft_atoi(argv[4]);
@@ -83,8 +85,11 @@ t_philo	**inicialize_philo(char **argv)
 	while (i < nb_philo)
 	{
 		p[i] = (t_philo *)malloc(sizeof(t_philo));
+		p[i]->fork_left = i;
+		p[i]->fork_right = (i + 1) % nb_philo;
 		p[i]->ate = 0;
 		p[i]->over = 0;
+		p[i]->finished = 0;
 		if (argv[5])
 		{
 			p[i]->nb_must_eat = ft_atoi(argv[5]);
@@ -104,21 +109,19 @@ void	print_time(t_philo *p, int nb)
 	
 	gettimeofday(&tv, NULL);
 	//milliseconds = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
-	if(pthread_mutex_lock(&p->inf->mutex_print) != 0)
-		perror("Failed to lock mutex_print");
-	if (nb == 1)
-		printf("%d %d has taken a fork\n", tv.tv_usec, p->philo_id);
-	else if (nb == 2)
-		printf("%d %d is eating\n", tv.tv_usec, p->philo_id);
-	else if (nb == 3)
-		printf("%d %d is sleeping\n", tv.tv_usec, p->philo_id);
-	else if (nb == 4)
-		printf("%d %d is thinking\n", tv.tv_usec, p->philo_id);
-	else if (nb == 5)
+	pthread_mutex_lock(&p->inf->mutex_print);
+	if (!p->inf->dead)
 	{
-		printf("%d %d died\n", tv.tv_usec, p->philo_id);
-		usleep(10000);
+		if (nb == 1)
+			printf("%d %d has taken a fork\n", tv.tv_usec, p->philo_id);
+		else if (nb == 2)
+			printf("%d %d is eating\n", tv.tv_usec, p->philo_id);
+		else if (nb == 3)
+			printf("%d %d is sleeping\n", tv.tv_usec, p->philo_id);
+		else if (nb == 4)
+			printf("%d %d is thinking\n", tv.tv_usec, p->philo_id);
+		else if (nb == 5)
+			printf("%d %d died\n", tv.tv_usec, p->philo_id);
 	}
-	if(pthread_mutex_unlock(&p->inf->mutex_print) != 0)
-		perror("Failed to unlock mutex_print");
+	pthread_mutex_unlock(&p->inf->mutex_print);
 }
