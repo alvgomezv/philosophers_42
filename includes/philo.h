@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:41:28 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/20 15:30:36 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/23 19:07:51 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,12 @@ typedef struct s_info
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				dead;
-	pthread_mutex_t *mutex_forks;
-	pthread_mutex_t mutex_eat;
-	pthread_mutex_t mutex_print;
-	pthread_mutex_t mutex_die;
+	int				*ate_once;
+	int				*forks_locked;
+	pthread_mutex_t	*mutex_forks;
+	pthread_mutex_t	mutex_eat;
+	pthread_mutex_t	mutex_print;
+	pthread_mutex_t	mutex_die;
 }				t_info;
 
 typedef struct s_philo
@@ -43,16 +45,29 @@ typedef struct s_philo
 	int				fork_left;
 	int				fork_right;
 	int				ate;
-	int				over;
 	int				finished;
 }				t_philo;
 
 //Utils
+void	destroy_mutex(t_philo **p, t_info *inf);
+void	ft_error(char *str);
 int		ft_atoi(char *str);
 void	ft_free(t_philo **p);
+void	print_time(t_philo *p, int nb);
+
+//Forks
+void	picking_forks(t_philo *p);
+
+//Init
+void	inicialize_mutex(t_philo **p, t_info *inf);
 t_info	*inicialize_info(char **argv);
 t_philo	**inicialize_philo(char **argv);
-void	print_time(t_philo *p, int nb);
+
+//Stages
+int		all_finished(t_philo **p, t_info *inf);
+int		all_eaten(t_philo	*p);
+void	*dying_routine(void *arg);
+void	eating(t_philo	*p);
 
 #endif
 

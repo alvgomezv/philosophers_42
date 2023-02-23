@@ -6,7 +6,7 @@
 #    By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/22 15:07:14 by alvgomez          #+#    #+#              #
-#    Updated: 2023/02/16 12:55:50 by alvgomez         ###   ########.fr        #
+#    Updated: 2023/02/23 19:36:37 by alvgomez         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,7 +43,7 @@ clean:
 
 fclean:	clean
 		@rm -f ${NAME}
-		@rmdir $(OBJ_DIR)
+		@rm -rf $(OBJ_DIR)
 
 re: fclean all
 

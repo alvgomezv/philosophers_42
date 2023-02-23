@@ -6,11 +6,32 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 11:21:34 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/20 17:55:56 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/23 19:09:42 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+
+void	ft_error(char *str)
+{
+	printf("%s\n", str);
+	exit(EXIT_FAILURE);
+}
+
+void	destroy_mutex(t_philo **p, t_info *inf)
+{
+	int	i;
+
+	i = 0;
+	pthread_mutex_destroy (&inf->mutex_eat);
+	pthread_mutex_destroy (&inf->mutex_print);
+	pthread_mutex_destroy (&inf->mutex_die);
+	while (i < inf->nb_philo)
+	{
+		pthread_mutex_destroy(&inf->mutex_forks[i]);
+		i++;
+	}
+}
 
 int	ft_atoi(char *str)
 {
@@ -38,10 +59,14 @@ int	ft_atoi(char *str)
 void	ft_free(t_philo **p)
 {
 	int	i;
+	int	j;
 	int	nb_philo;
-	
+
 	i = 0;
+	j = 0;
 	nb_philo = p[0]->inf->nb_philo;
+	free(p[0]->inf->mutex_forks);
+	free(p[0]->inf->ate_once);
 	while (i < nb_philo)
 	{
 		free(p[i]);
@@ -50,78 +75,30 @@ void	ft_free(t_philo **p)
 	free(p);
 }
 
-t_info	*inicialize_info(char **argv)
-{
-	t_info	*inf;
-	int		i;
-
-	inf = (t_info *)malloc(sizeof(t_info));
-	if (!inf)
-		perror("Failed to allocate memory");
-	inf->nb_philo = ft_atoi(argv[1]);
-	inf->mutex_forks = (t_infopthread_mutex_t *)malloc(inf->nb_philo * sizeof(pthread_mutex_t))
-	inf->time_to_die = ft_atoi(argv[2]);
-	inf->time_to_eat = ft_atoi(argv[3]);
-	inf->time_to_sleep = ft_atoi(argv[4]);
-	if (inf->time_to_die <= 0 || inf->time_to_eat <= 0 || inf->time_to_sleep <= 0)
-		perror("Incorrect argument");
-	inf->dead = 0;
-	return (inf);
-}
-
-t_philo	**inicialize_philo(char **argv)
-{
-	t_philo	**p;
-	int		nb_philo;
-	int 	i;
-
-	i = 0;
-	nb_philo = ft_atoi(argv[1]);
-	if (nb_philo <= 0)
-		perror("Incorrect argument");
-	p = (t_philo **)malloc(nb_philo * sizeof(t_philo *));
-	if (!p)
-		perror("Failed to allocate memory");
-	while (i < nb_philo)
-	{
-		p[i] = (t_philo *)malloc(sizeof(t_philo));
-		p[i]->fork_left = i;
-		p[i]->fork_right = (i + 1) % nb_philo;
-		p[i]->ate = 0;
-		p[i]->over = 0;
-		p[i]->finished = 0;
-		if (argv[5])
-		{
-			p[i]->nb_must_eat = ft_atoi(argv[5]);
-			if (p[i]->nb_must_eat <= 0)
-				perror("Incorrect argument");
-		}
-		else
-			p[i]->nb_must_eat = -1;
-		i++;
-	}
-	return (p);
-}
 void	print_time(t_philo *p, int nb)
 {
-	struct timeval tv;
-	//unsigned long long 	milliseconds;
-	
+	struct timeval		tv;
+	long long unsigned	milliseconds;
+
 	gettimeofday(&tv, NULL);
-	//milliseconds = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
+	milliseconds = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
 	pthread_mutex_lock(&p->inf->mutex_print);
 	if (!p->inf->dead)
 	{
-		if (nb == 1)
-			printf("%d %d has taken a fork\n", tv.tv_usec, p->philo_id);
+		if (nb == 5)
+		{
+			printf("%llu %d died\n", milliseconds, p->philo_id);
+			usleep(100);
+		}
+		else if (nb == 1)
+			printf("%llu %d has taken a fork\n", milliseconds, p->philo_id);
 		else if (nb == 2)
-			printf("%d %d is eating\n", tv.tv_usec, p->philo_id);
+			printf("%llu %d is eating\n", milliseconds, p->philo_id);
+			//printf("%llu %d is eating %d\n", milliseconds, p->philo_id, p->nb_must_eat);
 		else if (nb == 3)
-			printf("%d %d is sleeping\n", tv.tv_usec, p->philo_id);
+			printf("%llu %d is sleeping\n", milliseconds, p->philo_id);
 		else if (nb == 4)
-			printf("%d %d is thinking\n", tv.tv_usec, p->philo_id);
-		else if (nb == 5)
-			printf("%d %d died\n", tv.tv_usec, p->philo_id);
+			printf("%llu %d is thinking\n", milliseconds, p->philo_id);
 	}
 	pthread_mutex_unlock(&p->inf->mutex_print);
 }
