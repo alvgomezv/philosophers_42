@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 11:21:34 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 19:37:57 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 21:10:52 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ void	ft_error(char *str)
 	exit(EXIT_FAILURE);
 }
 
-long long unsigned	time_milliseconds(void)
+long long int	time_milliseconds(void)
 {
 	struct timeval		tv;
-	long long unsigned	milliseconds;
+	long long int	milliseconds;
 
 	gettimeofday(&tv, NULL);
 	milliseconds = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;

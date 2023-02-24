@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 15:31:31 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 20:06:03 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 21:17:45 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,9 @@ void	*dying_routine(void *arg)
 //	}
 //}
 
-void	pausing_philo(t_philo *p, long long unsigned sleep)
+void	pausing_philo(t_philo *p, long long int sleep)
 {
-	long long unsigned	wake_up;
+	long long int	wake_up;
 
 	wake_up = time_milliseconds() + sleep;
 	while (time_milliseconds() < wake_up)
@@ -92,6 +92,19 @@ void	pausing_philo(t_philo *p, long long unsigned sleep)
 	
 }
 
+long long int	time_to_think(t_philo *p)
+{
+	long long int	time_to_think;
+
+	time_to_think = (p->inf->time_to_die - (time_milliseconds()
+				- p->last_meal) - p->inf->time_to_eat) / 2;
+	if (time_to_think < 0)
+		time_to_think = 0;
+	else if (time_to_think > 600)
+		time_to_think = 600;
+	return (time_to_think);
+}	
+
 void	eating(t_philo *p)
 {
 	pthread_t	t_died;
@@ -99,6 +112,7 @@ void	eating(t_philo *p)
 	pthread_mutex_lock(&p->inf->mutex_eat_die[p->philo_id - 1]);
 	p->ate++;
 	print_time(p, 2);
+	p->last_meal = time_milliseconds();
 	pthread_mutex_unlock(&p->inf->mutex_eat_die[p->philo_id - 1]);
 	if (p->nb_must_eat != 0)
 	{

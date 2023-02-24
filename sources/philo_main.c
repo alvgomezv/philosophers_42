@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:28:34 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 20:05:45 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 21:19:02 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,14 @@ void	*routine(void *arg)
 	{
 		if (p->finished == 0)
 			picking_forks(p);
-		if (p->finished == 0 && !p->inf->dead)
+		if (p->finished == 0 && p->inf->dead == 0)
 		{
 			print_time(p, 3);
 			pausing_philo(p, p->inf->time_to_sleep);
 			//usleep(p->inf->time_to_sleep * 1000);
 		}
+		if (p->finished == 0 && p->inf->dead == 0)
+			pausing_philo(p, time_to_think(p));
 		else
 			break ;
 	}
