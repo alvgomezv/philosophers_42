@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 18:25:13 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/23 19:28:10 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 19:24:44 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,15 +77,15 @@ static void	pick_right_and_left(t_philo *p)
 
 void	picking_forks(t_philo *p)
 {
-	while (1)
-	{
-		if (p->inf->ate_once[p->philo_id - 1] == 0)
-		{
-			if (p->philo_id != p->inf->nb_philo)
-				pick_left_and_right(p);
-			else
+	//while (1)
+	//{
+		//if (p->inf->ate_once[p->philo_id - 1] == 0)
+		//{
+			//if (p->philo_id != p->inf->nb_philo)
+			//	pick_left_and_right(p);
+			//else
 				pick_right_and_left(p);
-			break ;
-		}
-	}
+			//break ;
+		//}
+	//}
 }

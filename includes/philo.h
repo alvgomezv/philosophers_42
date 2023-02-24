@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:41:28 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/23 19:07:51 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 19:45:53 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ typedef struct s_info
 	int				*ate_once;
 	int				*forks_locked;
 	pthread_mutex_t	*mutex_forks;
-	pthread_mutex_t	mutex_eat;
-	pthread_mutex_t	mutex_print;
+	pthread_mutex_t	*mutex_eat_die;
 	pthread_mutex_t	mutex_die;
+	pthread_mutex_t	mutex_print;
 }				t_info;
 
 typedef struct s_philo
@@ -49,25 +49,30 @@ typedef struct s_philo
 }				t_philo;
 
 //Utils
-void	destroy_mutex(t_philo **p, t_info *inf);
-void	ft_error(char *str);
-int		ft_atoi(char *str);
-void	ft_free(t_philo **p);
-void	print_time(t_philo *p, int nb);
+void				ft_error(char *str);
+long long unsigned	time_milliseconds(void);
+int					ft_atoi(char *str);
+void				ft_free(t_philo **p);
+void				print_time(t_philo *p, int nb);
 
 //Forks
-void	picking_forks(t_philo *p);
+void				picking_forks(t_philo *p);
 
 //Init
-void	inicialize_mutex(t_philo **p, t_info *inf);
-t_info	*inicialize_info(char **argv);
-t_philo	**inicialize_philo(char **argv);
+t_info				*inicialize_info(char **argv);
+t_philo				**inicialize_philo(char **argv);
 
 //Stages
-int		all_finished(t_philo **p, t_info *inf);
-int		all_eaten(t_philo	*p);
-void	*dying_routine(void *arg);
-void	eating(t_philo	*p);
+int					all_finished(t_philo **p, t_info *inf);
+//int					all_eaten(t_philo	*p);
+void				pausing_philo(t_philo *p, long long unsigned sleep);
+void				*dying_routine(void *arg);
+void				eating(t_philo	*p);
+
+//Mutex
+void				inicialize_mutex(t_philo **p, t_info *inf);
+void				destroy_mutex(t_philo **p, t_info *inf);
+
 
 #endif
 

@@ -6,16 +6,11 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:28:34 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/23 19:19:47 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 20:05:45 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
-
-void	leaks(void)
-{
-	system("leaks -q philo");
-}
 
 void	*routine(void *arg)
 {
@@ -31,10 +26,11 @@ void	*routine(void *arg)
 	{
 		if (p->finished == 0)
 			picking_forks(p);
-		if (p->finished == 0)
+		if (p->finished == 0 && !p->inf->dead)
 		{
 			print_time(p, 3);
-			usleep(p->inf->time_to_sleep * 1000);
+			pausing_philo(p, p->inf->time_to_sleep);
+			//usleep(p->inf->time_to_sleep * 1000);
 		}
 		else
 			break ;
@@ -77,11 +73,11 @@ void	philo_routine(t_philo **p, char **argv)
 	{
 		if (inf->dead)
 		{
-			//pthread_mutex_lock(&inf->mutex_print);
+			pthread_mutex_lock(&inf->mutex_print);
 			break ;
 		}
 	}
-	//pthread_mutex_unlock(&inf->mutex_print);
+	pthread_mutex_unlock(&inf->mutex_print);
 	destroy_mutex(p, inf);
 	free(inf);
 }
@@ -99,6 +95,5 @@ int	main(int argc, char **argv)
 		philo_routine(p, argv);
 		ft_free(p);
 	}
-	//atexit(leaks);
 	return (0);
 }

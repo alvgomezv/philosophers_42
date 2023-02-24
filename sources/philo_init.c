@@ -6,33 +6,25 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 18:17:53 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/23 19:16:15 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 19:35:17 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-void	inicialize_mutex(t_philo **p, t_info *inf)
-{
-	int	i;
-
-	i = 0;
-	pthread_mutex_init (&inf->mutex_eat, NULL);
-	pthread_mutex_init (&inf->mutex_print, NULL);
-	pthread_mutex_init (&inf->mutex_die, NULL);
-	while (i < inf->nb_philo)
-	{
-		pthread_mutex_init(&inf->mutex_forks[i], NULL);
-		i++;
-	}
-}
-
-//CUIDADO
 static void	arrays_to_zero(t_info *inf)
 {
 	int	i;
 
 	i = 0;
+	inf->mutex_forks = (pthread_mutex_t *)malloc(inf->nb_philo
+			* sizeof(pthread_mutex_t));
+	if (!inf->mutex_forks)
+		ft_error("Failed to allocate memory");
+	inf->mutex_eat_die = (pthread_mutex_t *)malloc(inf->nb_philo
+			* sizeof(pthread_mutex_t));
+	if (!inf->mutex_eat_die)
+		ft_error("Failed to allocate memory");
 	while (i < inf->nb_philo)
 	{
 		inf->ate_once[i] = 0;
@@ -49,10 +41,6 @@ t_info	*inicialize_info(char **argv)
 	if (!inf)
 		ft_error("Failed to allocate memory");
 	inf->nb_philo = ft_atoi(argv[1]);
-	inf->mutex_forks = (pthread_mutex_t *)malloc(inf->nb_philo
-			* sizeof(pthread_mutex_t));
-	if (!inf->mutex_forks)
-		ft_error("Failed to allocate memory");
 	inf->time_to_die = ft_atoi(argv[2]);
 	inf->time_to_eat = ft_atoi(argv[3]);
 	inf->time_to_sleep = ft_atoi(argv[4]);
@@ -70,7 +58,6 @@ t_info	*inicialize_info(char **argv)
 	return (inf);
 }
 
-//CUIDADO
 static void	inizialize_parameters(t_philo **p, char **argv, int nb_philo)
 {
 	int	i;

@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 11:21:34 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/23 19:09:42 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/24 19:37:57 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,14 @@ void	ft_error(char *str)
 	exit(EXIT_FAILURE);
 }
 
-void	destroy_mutex(t_philo **p, t_info *inf)
+long long unsigned	time_milliseconds(void)
 {
-	int	i;
+	struct timeval		tv;
+	long long unsigned	milliseconds;
 
-	i = 0;
-	pthread_mutex_destroy (&inf->mutex_eat);
-	pthread_mutex_destroy (&inf->mutex_print);
-	pthread_mutex_destroy (&inf->mutex_die);
-	while (i < inf->nb_philo)
-	{
-		pthread_mutex_destroy(&inf->mutex_forks[i]);
-		i++;
-	}
+	gettimeofday(&tv, NULL);
+	milliseconds = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
+	return (milliseconds);
 }
 
 int	ft_atoi(char *str)
@@ -67,6 +62,7 @@ void	ft_free(t_philo **p)
 	nb_philo = p[0]->inf->nb_philo;
 	free(p[0]->inf->mutex_forks);
 	free(p[0]->inf->ate_once);
+	free(p[0]->inf->forks_locked);
 	while (i < nb_philo)
 	{
 		free(p[i]);
@@ -77,19 +73,14 @@ void	ft_free(t_philo **p)
 
 void	print_time(t_philo *p, int nb)
 {
-	struct timeval		tv;
 	long long unsigned	milliseconds;
 
-	gettimeofday(&tv, NULL);
-	milliseconds = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
+	milliseconds = time_milliseconds();
 	pthread_mutex_lock(&p->inf->mutex_print);
 	if (!p->inf->dead)
 	{
 		if (nb == 5)
-		{
 			printf("%llu %d died\n", milliseconds, p->philo_id);
-			usleep(100);
-		}
 		else if (nb == 1)
 			printf("%llu %d has taken a fork\n", milliseconds, p->philo_id);
 		else if (nb == 2)
