@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 18:25:13 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 21:17:11 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/25 11:53:54 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	mutex_fork(t_philo *p, int fork, int lock)
 	}
 }
 
-static void	pick_left_and_right(t_philo *p)
+void	picking_forks(t_philo *p)
 {
 	while (1)
 	{
@@ -56,43 +56,4 @@ static void	pick_left_and_right(t_philo *p)
 	mutex_fork(p, p->fork_left, 0);
 	if (p->inf->nb_philo != 1)
 		mutex_fork(p, p->fork_right, 0);
-}
-
-//static void	pick_right_and_left(t_philo *p)
-//{
-//	while (1)
-//	{
-//		if (p->inf->forks_locked[p->fork_left] == 0
-//			&& p->inf->forks_locked[p->fork_right] == 0)
-//		{
-//			if (p->inf->nb_philo != 1)
-//				mutex_fork(p, p->fork_right, 1);
-//			if (p->inf->forks_locked[p->fork_left] == 0)
-//			{
-//				mutex_fork(p, p->fork_left, 1);
-//				break ;
-//			}
-//			else
-//				mutex_fork(p, p->fork_right, 0);
-//		}
-//	}
-//	eating(p);
-//	if (p->inf->nb_philo != 1)
-//		mutex_fork(p, p->fork_right, 0);
-//	mutex_fork(p, p->fork_left, 0);
-//}
-
-void	picking_forks(t_philo *p)
-{
-	//while (1)
-	//{
-		//if (p->inf->ate_once[p->philo_id - 1] == 0)
-		//{
-			//if (p->philo_id != p->inf->nb_philo)
-				pick_left_and_right(p);
-			//else
-			//	pick_right_and_left(p);
-			//break ;
-		//}
-	//}
 }

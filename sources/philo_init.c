@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 18:17:53 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 21:02:40 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/25 11:38:59 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ t_info	*inicialize_info(char **argv)
 	inf->time_to_die = ft_atoi(argv[2]);
 	inf->time_to_eat = ft_atoi(argv[3]);
 	inf->time_to_sleep = ft_atoi(argv[4]);
-	if (inf->time_to_die <= 0 || inf->time_to_eat <= 0
-		|| inf->time_to_sleep <= 0)
+	if (inf->time_to_die < 0 || inf->time_to_eat < 0
+		|| inf->time_to_sleep < 0)
 		ft_error("Incorrect argument");
 	inf->dead = 0;
 	inf->ate_once = (int *)malloc(inf->nb_philo * sizeof(int));

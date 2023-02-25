@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 11:21:34 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 21:10:52 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/25 11:56:30 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	ft_error(char *str)
 
 long long int	time_milliseconds(void)
 {
-	struct timeval		tv;
+	struct timeval	tv;
 	long long int	milliseconds;
 
 	gettimeofday(&tv, NULL);
@@ -30,8 +30,8 @@ long long int	time_milliseconds(void)
 
 int	ft_atoi(char *str)
 {
-	int		i;
-	int		nbr;
+	int			i;
+	long int	nbr;
 
 	i = 0;
 	nbr = 0;
@@ -47,6 +47,8 @@ int	ft_atoi(char *str)
 		i++;
 	}
 	if (str[i])
+		return (-1);
+	if (nbr > 2147483637)
 		return (-1);
 	return (nbr);
 }
@@ -73,23 +75,20 @@ void	ft_free(t_philo **p)
 
 void	print_time(t_philo *p, int nb)
 {
-	long long unsigned	milliseconds;
-
-	milliseconds = time_milliseconds();
 	pthread_mutex_lock(&p->inf->mutex_print);
 	if (!p->inf->dead)
 	{
 		if (nb == 5)
-			printf("%llu %d died\n", milliseconds, p->philo_id);
+			printf("%llu %d died\n", time_milliseconds(), p->philo_id);
 		else if (nb == 1)
-			printf("%llu %d has taken a fork\n", milliseconds, p->philo_id);
+			printf("%llu %d has taken a fork\n",
+				time_milliseconds(), p->philo_id);
 		else if (nb == 2)
-			printf("%llu %d is eating\n", milliseconds, p->philo_id);
-			//printf("%llu %d is eating %d\n", milliseconds, p->philo_id, p->nb_must_eat);
+			printf("%llu %d is eating\n", time_milliseconds(), p->philo_id);
 		else if (nb == 3)
-			printf("%llu %d is sleeping\n", milliseconds, p->philo_id);
+			printf("%llu %d is sleeping\n", time_milliseconds(), p->philo_id);
 		else if (nb == 4)
-			printf("%llu %d is thinking\n", milliseconds, p->philo_id);
+			printf("%llu %d is thinking\n", time_milliseconds(), p->philo_id);
 	}
 	pthread_mutex_unlock(&p->inf->mutex_print);
 }

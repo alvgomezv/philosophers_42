@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 10:41:28 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 21:22:55 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/25 11:58:43 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ t_philo			**inicialize_philo(char **argv);
 
 //Stages
 int				all_finished(t_philo **p, t_info *inf);
+
 //int					all_eaten(t_philo	*p);
 void			pausing_philo(t_philo *p, long long int sleep);
 long long int	time_to_think(t_philo *p);
@@ -75,6 +76,4 @@ void			eating(t_philo	*p);
 void			inicialize_mutex(t_philo **p, t_info *inf);
 void			destroy_mutex(t_philo **p, t_info *inf);
 
-
 #endif
-

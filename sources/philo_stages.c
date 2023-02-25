@@ -6,7 +6,7 @@
 /*   By: alvgomez <alvgomez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 15:31:31 by alvgomez          #+#    #+#             */
-/*   Updated: 2023/02/24 21:17:45 by alvgomez         ###   ########.fr       */
+/*   Updated: 2023/02/25 11:54:24 by alvgomez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,21 +28,6 @@ int	all_finished(t_philo **p, t_info *inf)
 	return (all_finish);
 }
 
-//int	all_eaten(t_philo *p)
-//{
-//	int	i;
-//	int	all_eaten;
-//
-//	i = 0;
-//	while (i < p->inf->nb_philo)
-//	{
-//		if (p->inf->ate_once[i] == 0)
-//			all_eaten = 0;
-//		i++;
-//	}
-//	return (all_eaten);
-//}
-
 void	*dying_routine(void *arg)
 {
 	t_philo	*p;
@@ -63,21 +48,6 @@ void	*dying_routine(void *arg)
 	return (0);
 }
 
-//static void	aux_eating(t_philo	*p)
-//{
-//	int	i;
-//
-//	i = 0;
-//	if (all_eaten(p) == 1)
-//	{
-//		while (i < p->inf->nb_philo)
-//		{
-//			p->inf->ate_once[i] = 0;
-//			i++;
-//		}
-//	}
-//}
-
 void	pausing_philo(t_philo *p, long long int sleep)
 {
 	long long int	wake_up;
@@ -85,11 +55,10 @@ void	pausing_philo(t_philo *p, long long int sleep)
 	wake_up = time_milliseconds() + sleep;
 	while (time_milliseconds() < wake_up)
 	{
-		if(p->inf->dead == 1)
+		if (p->inf->dead == 1)
 			break ;
 		usleep(10);
 	}
-	
 }
 
 long long int	time_to_think(t_philo *p)
@@ -125,8 +94,5 @@ void	eating(t_philo *p)
 		p->nb_must_eat--;
 	if (p->nb_must_eat == 0)
 		p->finished = 1;
-	//p->inf->ate_once[p->philo_id - 1] = 1;
-	//aux_eating(p);
 	pausing_philo(p, p->inf->time_to_eat);
-	//usleep(p->inf->time_to_eat * 1000);
 }
